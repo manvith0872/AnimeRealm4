@@ -86,20 +86,21 @@
             text-align: center;
             position: relative;
             margin-top: 20px;
+            margin-bottom: 20px;
         }
         .search-bar input[type="text"] {
-            width: 60%;
+            width: 47%;
             padding: 10px 40px 10px 10px;
             border-radius: 5px;
             border: 1px solid #ccc;
         }
         .search-bar img {
             position: absolute;
-            right: 10px;
+            right: 300px;
             top: 50%;
             transform: translateY(-50%);
-            width: 24px;
-            height: 24px;
+            width: 60px;
+            height: 60px;
             cursor: pointer;
         }
         .container {
@@ -119,16 +120,16 @@
         .gallery {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 20px;
             justify-content: center;
         }
         .gallery-item {
             width: 300px;
             background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 5px;
+            border-radius: 3px;
             overflow: hidden;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         .gallery-item video {
             width: 100%;
@@ -197,7 +198,7 @@
             color: #ffffff;
             border: none;
             padding: 10px;
-            width: 100%;
+            width: 30%;
             border-radius: 5px;
             cursor: pointer;
         }
@@ -241,17 +242,83 @@
         .profile-dropdown a:hover {
             background-color: #575757;
         }
+        #chat-section {
+           background-color: rgba(0, 0, 0, 0.8);
+           padding: 20px;
+           border-radius: 5px;
+           margin-top: 20px;
+           color: #ffffff;
+        }
+
+        .chat-box {
+           max-height: 300px;
+           overflow-y: auto;
+           background-color: rgba(255, 255, 255, 0.1);
+           padding: 10px;
+           margin-bottom: 10px;
+           border-radius: 5px;
+        }
+
+        #chat-input {
+           width: 80%;
+           padding: 10px;
+           border-radius: 5px;
+           border: 1px solid #ccc;
+           margin-right: 10px;
+        }
+
+        button {
+           padding: 10px;
+           border: none;
+           background-color: #4285f4;
+           color: #ffffff;
+           border-radius: 5px;
+           cursor: pointer;
+       
+        #messages {
+           max-height: 300px;
+           overflow-y: auto;
+           margin-bottom: 10px;
+        }
+
+        #chat-input-container {
+           display: flex;
+        }
+
+        #chat-input {
+           flex: 1;
+           padding: 5px;
+           border: 1px solid #ccc;
+           border-radius: 3px;
+           margin-right: 5px;
+        }
+
+        #chat-input-container button {
+           padding: 5px 10px;
+           background-color: #4285f4;
+           color: white;
+           border: none;
+           border-radius: 3px;
+           cursor: pointer;
+        }
+
     </style>
 </head>
 <body>
-    <header>
+   <header>
     <img src="image.ico" alt="AnimeRealm Icon">
     <h1>AnimeRealm</h1>
     <div class="icons-container">
-        <div class="notification-container">
+        <div class="notification-container" id="notification-container" style="display: none;">
             <div class="notification-icon">
                 <img src="Notification Icon.png" alt="Notifications">
             </div>
+        </div>
+        <div id="upload-container" style="display: none;">
+            <label for="upload-video">
+                <img src="Upload Icon.png" alt="Upload Video" style="cursor: pointer; width: 24px; height: 24px;">
+            </label>
+            <input type="file" id="upload-video" style="display: none;" accept="video/*" onchange="handleVideoUpload()">
         </div>
         <div class="profile-container" id="profile-container">
             <button class="sign-in-button" onclick="toggleSignInForm()">Sign In</button>
@@ -265,6 +332,7 @@
         <a href="#top-rated" onclick="showSection('top-rated')">Top Rated</a>
         <a href="#recently-added" onclick="showSection('recently-added')">Recently Added</a>
         <a href="#contact" onclick="showSection('contact')">Contact Us</a>
+        <a href="#chat-section" onclick="showSection('chat-section')">Chat</a>
     </nav>
     <div class="welcome-box" id="welcome-box">
         <h2>Welcome to AnimeRealm</h2>
@@ -348,7 +416,21 @@
         <section id="contact" class="section">
             <h2>Contact Us</h2>
             <p>If you have any questions or feedback, feel free to reach out to us!</p>
-            <p>Email: contact@animerealm.com</p>
+            <p>Email: manvithudupa073@gmail.com</p>
+        </section>
+        <section id="profile" class="section">
+            <h2>User Profile</h2>
+            <p><strong>Email or Phone:</strong> <span id="profile-emailOrPhone"></span></p>
+            <p><strong>Username:</strong> <span id="profile-username"></span></p>
+            <button onclick="backToHome()">Back to Home</button>
+        </section>
+        <section id="chat-section" class="section">
+            <h2>Chat with Other Fans</h2>
+            <div id="chat-box" class="chat-box">
+                <!-- Messages will appear here -->
+            </div>
+            <input type="text" id="chat-input" placeholder="Type your message...">
+            <button onclick="sendMessage()">Send</button>
         </section>
     </div>
     <div class="footer">
@@ -390,28 +472,39 @@
             document.getElementById("sign-in-form").style.display = "none";
         }
 
-        function signIn() {
-            const emailOrPhone = document.getElementById('emailOrPhone').value;
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            var profileContainer = document.getElementById('profile-container');
+       function signIn() {
+           const emailOrPhone = document.getElementById('emailOrPhone').value;
+           const username = document.getElementById('username').value;
+           const password = document.getElementById('password').value;
+           var profileContainer = document.getElementById('profile-container');
+           var notificationContainer = document.getElementById('notification-container'); // New line to get the notification container
+           var uploadContainer = document.getElementById('upload-container');  // Get the upload container
 
-            if (emailOrPhone && username && password) {
-                // Mock sign-in logic
-                const initials = username.charAt(0).toUpperCase();
-                document.getElementById('profile-container').innerHTML = `<div class="profile-icon" onclick="toggleProfileDropdown()">${initials}</div>
-                <div class="profile-dropdown" id="profile-dropdown">
-                    <a href="#" onclick="viewProfile()">View Profile</a>
-                    <a href="#" onclick="settings()">Settings</a>
-                    <a href="#" onclick="logout()">Log Out</a>
-                </div>`;
-                // Save user data to localStorage
-                localStorage.setItem('userData', JSON.stringify({ emailOrPhone, username }));
-                toggleSignInForm();
-            } else {
-                alert('Please fill in all fields.');
-            }
+           if (emailOrPhone && username && password) {
+               // Mock sign-in logic
+               const initials = username.charAt(0).toUpperCase();
+               document.getElementById('profile-container').innerHTML = `<div class="profile-icon" onclick="toggleProfileDropdown()">${initials}</div>
+               <div class="profile-dropdown" id="profile-dropdown">
+                   <a href="#" onclick="viewProfile()">View Profile</a>
+                   <a href="#" onclick="settings()">Settings</a>
+                   <a href="#" onclick="logout()">Log Out</a>
+               </div>`;
+        
+               // Show the notification icon after sign-in
+               notificationContainer.style.display = 'block'; // Show the notification icon
+               uploadContainer.style.display = 'block';        // Show the upload button
+
+
+              // Save user data to localStorage
+              localStorage.setItem('userData', JSON.stringify({ emailOrPhone, username, password }));
+              localStorage.setItem('isSignedIn', 'true'); // New line to save sign-in status
+
+              toggleSignInForm();
+        } else {
+              alert('Please fill in all fields.');
         }
+    }
+
 
         function toggleProfileDropdown() {
             const profileDropdown = document.getElementById('profile-dropdown');
@@ -419,27 +512,153 @@
         }
 
         function viewProfile() {
-            alert('View Profile clicked');
-            // Implement the view profile logic here
-        }
+            // Get user data from localStorage
+            const userData = JSON.parse(localStorage.getItem('userData'));
+
+            // If user data exists, populate profile section
+        if (userData) {
+            document.getElementById('profile-emailOrPhone').innerText = userData.emailOrPhone;
+            document.getElementById('profile-username').innerText = userData.username;
+    }
+
+    // Hide all other sections and the welcome box
+    const sections = document.querySelectorAll('.section');
+    sections.forEach(section => {
+        section.style.display = 'none';
+    });
+    
+    document.getElementById('welcome-box').style.display = 'none'; // Hide the welcome box
+    document.getElementById('profile').style.display = 'block';    // Show the profile section
+}
 
         function logout() {
             document.getElementById('profile-container').innerHTML = '<button class="sign-in-button" onclick="toggleSignInForm()">Sign In</button>';
             localStorage.removeItem('userData');
+            localStorage.removeItem('isSignedIn'); // Remove sign-in status
+            localStorage.removeItem('showUploadIcon');  // Remove upload icon visibility
+            document.getElementById('notification-container').style.display = 'none'; // Hide the notification icon
+            document.getElementById('upload-container').style.display = 'none';  // Hide the upload icon
         }
 
         document.addEventListener('DOMContentLoaded', function() {
             const userData = JSON.parse(localStorage.getItem('userData'));
+            const isSignedIn = localStorage.getItem('isSignedIn'); // Check if the user is signed in
+
             if (userData && userData.username) {
                 const initials = userData.username.charAt(0).toUpperCase();
                 document.getElementById('profile-container').innerHTML = `<div class="profile-icon" onclick="toggleProfileDropdown()">${initials}</div>
                 <div class="profile-dropdown" id="profile-dropdown">
                     <a href="#" onclick="viewProfile()">View Profile</a>
+                    <a href="#" onclick="settings()">Settings</a>
                     <a href="#" onclick="logout()">Log Out</a>
                 </div>`;
+                 
+                // If the user is signed in, show the notification icon
+                if (isSignedIn) {
+                   document.getElementById('notification-container').style.display = 'block';
+                   document.getElementById('upload-container').style.display = 'block'; // Show the upload icon
+                } 
             }
+            displayStoredVideos();
             document.getElementById('welcome-box').style.display = 'block';
         });
+        function backToHome() {
+            document.getElementById('profile').style.display = 'none';
+            showSection('home'); // Show the home section again
+        }
+        function handleVideoUpload() {
+           const fileInput = document.getElementById('upload-video');
+           const file = fileInput.files[0];
+
+           if (file) {
+               
+               // Get existing videos from localStorage or create a new array if none exist
+               let uploadedVideos = JSON.parse(localStorage.getItem('uploadedVideos')) || [];
+
+               // Add the new video details to the array
+               uploadedVideos.push({
+                   name: file.name,
+                   type: file.type,
+                   lastModified: file.lastModified,
+                   title: 'Newly Uploaded Video',  // Example title
+                   description: 'Description of the uploaded video.'  // Example description
+               });
+
+               // Save the updated video list back to localStorage
+               localStorage.setItem('uploadedVideos', JSON.stringify(uploadedVideos));
+
+               // Add the video to the page immediately
+               addVideoToHome(URL.createObjectURL(file), 'Newly Uploaded Video', 'Description of the uploaded video.');
+               
+           } else {
+               alert("Please select a video file to upload.");
+           }
+       }
+
+       function addVideoToHome(videoUrl, title = 'Newly Uploaded Video', description = 'Description of the uploaded video.') {
+           const homeSection = document.querySelector('#home .gallery');
+           const videoItem = document.createElement('div');
+           videoItem.classList.add('gallery-item');
+           videoItem.innerHTML = `
+              <video controls>
+                 <source src="${videoUrl}" type="video/mp4">
+                 Your browser does not support the video tag.
+              </video>
+              <h3>${title}</h3>
+              <p>${description}</p>
+          `;
+          homeSection.appendChild(videoItem);
+       }
+
+        function addVideoToRecentlyAdded(title = 'Newly Uploaded Video') {
+            const recentlyAddedSection = document.querySelector('#recently-added');
+            const videoItem = document.createElement('div');
+            videoItem.classList.add('anime-item');
+            videoItem.innerHTML = `Newly Uploaded Video`;
+            recentlyAddedSection.appendChild(videoItem);
+        }
+        function displayStoredVideos() {
+            const uploadedVideos = JSON.parse(localStorage.getItem('uploadedVideos')) || [];
+
+            uploadedVideos.forEach(video => {
+                addVideoToHome(video.videoData, video.title, video.description);
+            });
+        }
+        function sendMessage() {
+             // Select the chat input and chat box in the chat section
+             const chatInput = document.querySelector("#chat-section #chat-input");
+             const chatBox = document.querySelector("#chat-section .chat-box");
+
+             if (!chatInput || !chatBox) {
+                 console.error("Chat input or chat box not found.");
+                 return;
+            }
+
+            // Get the message text
+            const message = chatInput.value.trim();
+            if (message === "") {
+                alert("Please enter a message.");
+                return;
+            } 
+
+            // Create a new message element
+            const messageDiv = document.createElement("div");
+            messageDiv.textContent = message;
+            messageDiv.style.padding = "5px";
+            messageDiv.style.marginBottom = "5px";
+            messageDiv.style.backgroundColor = "rgba(255, 255, 255, 0.2)";
+            messageDiv.style.borderRadius = "5px";
+
+            // Append the message to the chat box
+            chatBox.appendChild(messageDiv);
+
+            // Clear the input field
+            chatInput.value = "";
+
+            // Scroll to the bottom of the chat box
+            chatBox.scrollTop = chatBox.scrollHeight;
+       }
+
     </script>
 </body>
 </html>
